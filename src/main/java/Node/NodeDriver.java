@@ -9,7 +9,10 @@ import java.rmi.NotBoundException;
 public class NodeDriver {
 
     public static void main(String[] args) throws IOException, NotBoundException {
-        Node node = new Node("127.0.0.1");
+        String node_ip=args[0];
+        String server_ip=args[1];
+
+        Node node = new Node(node_ip,server_ip);
 
         node.start();
     }

@@ -23,6 +23,7 @@ public class Node {
     private String ipAddress;
     private int port;
     private String name;
+    private String bootstrapServerIp;
 
     private List<Neighbour> myNeighbours = new ArrayList<>();
     private BootstrapCommunicator bootstrapCommunicator = new BootstrapCommunicatorUDPImpl();
@@ -33,9 +34,10 @@ public class Node {
 
     private final static Logger LOGGER = Logger.getLogger(Node.class.getName());
 
-    public Node(String ipAddress){
+    public Node(String ipAddress,String bootstrapServer){
         this.ipAddress = ipAddress;
         this.port = generatePort();
+        this.bootstrapServerIp=bootstrapServer;
     }
 
     public String getIpAddress() {
