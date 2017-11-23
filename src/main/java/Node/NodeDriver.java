@@ -15,5 +15,6 @@ public class NodeDriver {
         Node node = new Node(node_ip,server_ip);
 
         node.start();
+
     }
 }

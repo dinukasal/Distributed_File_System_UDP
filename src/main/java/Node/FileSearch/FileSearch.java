@@ -18,4 +18,6 @@ public interface FileSearch {
     void removeSearchResults(String ip, String port);
 
     void gracefulDeparture() throws IOException;
+
+    void search(String outMessage);
 }

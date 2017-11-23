@@ -136,27 +136,35 @@ public class FileSearchImpl implements FileSearch {
                 String outMessage = stdin.readLine();
 
                 if (outMessage.contains("ser")) {
-                    ArrayList<String> searchResults = searchFiles(outMessage.split(" ")[1]); //search file in the own directory
-                    if (searchResults.size() > 0) {
-                        System.out.println("File Found in My Node");
-                    } else {
-                        //check whether filename is already included in previous search results
-                        String[] ownersDetailsOfFiles = searchPreviousSearchResults(outMessage.split(" ")[1]);
-                        if (ownersDetailsOfFiles != null) {
-                            //forward request to owner
-                            System.out.println("File found from previous searched results. Request is forwarded directly to the owner.");
-                            forwardFileSearchRequestToOwner(outMessage.split(" ")[1], 3, ownersDetailsOfFiles[0],
-                                    Integer.parseInt(ownersDetailsOfFiles[1]), node.getIpAddress(), node.getPort());
-                        } else {
-                            forwardFileSearchRequest(outMessage.split(" ")[1], 3, node.getIpAddress(), node.getPort()); //forward request to a neighbour
-                        }
-                    }
+                    search(outMessage);
                 } else {
                     System.out.println("null in this node");
                 }
             }
         }  catch (IOException e1) {
             e1.printStackTrace();
+        }
+    }
+
+    public void search(String outMessage){
+        try {
+                ArrayList<String> searchResults = searchFiles(outMessage.split(" ")[1]); //search file in the own directory
+            if (searchResults.size() > 0) {
+                System.out.println("File Found in My Node");
+            } else {
+                //check whether filename is already included in previous search results
+                String[] ownersDetailsOfFiles = searchPreviousSearchResults(outMessage.split(" ")[1]);
+                if (ownersDetailsOfFiles != null) {
+                    //forward request to owner
+                    System.out.println("File found from previous searched results. Request is forwarded directly to the owner.");
+                    forwardFileSearchRequestToOwner(outMessage.split(" ")[1], 3, ownersDetailsOfFiles[0],
+                            Integer.parseInt(ownersDetailsOfFiles[1]), node.getIpAddress(), node.getPort());
+                } else {
+                    forwardFileSearchRequest(outMessage.split(" ")[1], 3, node.getIpAddress(), node.getPort()); //forward request to a neighbour
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 

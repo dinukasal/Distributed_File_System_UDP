@@ -137,5 +137,7 @@ public class Node {
         }
     }
 
-
+    public void search(String str){
+        fileSearch.search(str);
+    }
 }
