@@ -15,4 +15,5 @@ public interface BootstrapCommunicator {
     List<Neighbour> register(String ipAddress, int port, String username) throws IOException, NotBoundException;
 
     boolean unregister(String ipAddress, int port, String username) throws IOException;
+    public void setServer(String ipAddress);
 }

@@ -12,12 +12,13 @@ import static Node.Constants.*;
  * Created by nadunindunil on 11/16/17.
  */
 public class BootstrapCommunicatorUDPImpl implements BootstrapCommunicator {
+    private String server_ip;
 
     @Override
     public List<Neighbour> register(String ipAddress, int port, String username) throws IOException, NotBoundException {
         String msg = String.format(REGISTER_FORMAT, ipAddress, port, username);
         String request = Request.create(msg);
-        String response = Request.sendAsyncMessage(request, BOOTSERVER_IP, Integer.toString(BOOTSERVER_PORT));
+        String response = Request.sendAsyncMessage(request, server_ip, Integer.toString(BOOTSERVER_PORT));
         return Request.decodeRegisterResponse(response);
     }
 
@@ -25,9 +26,15 @@ public class BootstrapCommunicatorUDPImpl implements BootstrapCommunicator {
     public boolean unregister(String ipAddress, int port, String username) throws IOException {
         String msg = String.format(UNREGISTER_FORMAT, ipAddress, port, username);
         String request = Request.create(msg);
-        String response = Request.sendAsyncMessage(request, BOOTSERVER_IP, Integer.toString(BOOTSERVER_PORT));
+        String response = Request.sendAsyncMessage(request, server_ip, Integer.toString(BOOTSERVER_PORT));
 
 //        return Request.decodeUnregister(response);
         return true;
     }
+
+    @Override
+    public void setServer(String ipAddress){
+        this.server_ip=ipAddress;
+    }
+
 }

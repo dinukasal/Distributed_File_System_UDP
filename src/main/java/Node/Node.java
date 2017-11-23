@@ -38,6 +38,7 @@ public class Node {
         this.ipAddress = ipAddress;
         this.port = generatePort();
         this.bootstrapServerIp=bootstrapServer;
+        bootstrapCommunicator.setServer(bootstrapServerIp);
     }
 
     public String getIpAddress() {
