@@ -20,4 +20,6 @@ public interface FileSearch {
     void gracefulDeparture() throws IOException;
 
     void search(String outMessage);
+
+    void searchWithOk(String outMessage);
 }

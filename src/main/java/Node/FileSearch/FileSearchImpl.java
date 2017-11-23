@@ -6,6 +6,7 @@ import Node.Communicators.SearchCommunicatorUDPImpl;
 import Node.Node;
 import Node.Neighbour;
 
+import com.sun.org.apache.xpath.internal.SourceTree;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by nadunindunil on 11/17/17.
@@ -28,6 +30,9 @@ public class FileSearchImpl implements FileSearch {
     private SearchCommunicator searchCommunicator = new SearchCommunicatorUDPImpl();
     private Node node;
     private ExecutorService executorService;
+
+    private int fileFoundState=2;
+    long startTime;
 
     public FileSearchImpl(Node node) {
         this.node = node;
@@ -58,6 +63,8 @@ public class FileSearchImpl implements FileSearch {
             System.out.println("File Found!!!");
             addRecords(fileName, originatorIP, String.valueOf(originatorPort));
             forwardFileSearchOKResponse(searchResults, hops, originatorIP, originatorPort);
+
+            fileFoundState=1;
         } else {
             if (hops > 0) {
                 //check whether filename is already included in previous search results
@@ -72,8 +79,10 @@ public class FileSearchImpl implements FileSearch {
             } else {
                 forwardFileSearchOKResponse(null, -10, originatorIP, originatorPort);
                 System.out.println("File Couldn't found!!!");
+                fileFoundState=0;
             }
         }
+        
     }
 
     @Override
@@ -146,7 +155,53 @@ public class FileSearchImpl implements FileSearch {
         }
     }
 
+    @Override
     public void search(String outMessage){
+        try {
+            startTime=System.nanoTime();
+                ArrayList<String> searchResults = searchFiles(outMessage.split(" ")[1]); //search file in the own directory
+            if (searchResults.size() > 0) {
+                System.out.println("File Found in My Node");
+            } else {
+                //check whether filename is already included in previous search results
+                String[] ownersDetailsOfFiles = searchPreviousSearchResults(outMessage.split(" ")[1]);
+                if (ownersDetailsOfFiles != null) {
+                    //forward request to owner
+                    System.out.println("File found from previous searched results. Request is forwarded directly to the owner.");
+                    forwardFileSearchRequestToOwner(outMessage.split(" ")[1], 3, ownersDetailsOfFiles[0],
+                            Integer.parseInt(ownersDetailsOfFiles[1]), node.getIpAddress(), node.getPort());
+                } else {
+                    forwardFileSearchRequest(outMessage.split(" ")[1], 3, node.getIpAddress(), node.getPort()); //forward request to a neighbour
+                }
+            }
+
+            while(fileFoundState==2){
+                long elapsed=(System.nanoTime()-startTime)/1000000;
+                
+                if(fileFoundState==1){
+                    System.out.println("****File Found Time Elapsed:"+Long.toString(elapsed));
+                    break;
+                }else if(fileFoundState==0){
+                    System.out.println("not found.. Time Elapsed:"+Long.toString(elapsed));
+                    break;
+                }
+
+                if(elapsed>3000){
+                    System.out.println("not found.. Time Elapsed:"+Long.toString(elapsed));
+                    
+                    break;
+                }else{
+                    TimeUnit.MILLISECONDS.sleep(10);
+                }
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void searchWithOk(String outMessage){
         try {
                 ArrayList<String> searchResults = searchFiles(outMessage.split(" ")[1]); //search file in the own directory
             if (searchResults.size() > 0) {
