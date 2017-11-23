@@ -1,3 +1,7 @@
 .idea/
 target/
 *.iml
+script.sh
+commit.sh
+server.sh
+push.sh
