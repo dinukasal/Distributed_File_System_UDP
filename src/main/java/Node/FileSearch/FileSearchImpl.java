@@ -1,10 +1,10 @@
 package Node.FileSearch;
 
-
 import Node.Communicators.SearchCommunicator;
 import Node.Communicators.SearchCommunicatorUDPImpl;
 import Node.Node;
 import Node.Neighbour;
+import Node.FileWriter;
 
 import com.sun.org.apache.xpath.internal.SourceTree;
 import java.io.*;
@@ -30,6 +30,9 @@ public class FileSearchImpl implements FileSearch {
     private SearchCommunicator searchCommunicator = new SearchCommunicatorUDPImpl();
     private Node node;
     private ExecutorService executorService;
+    private FileWriter fileWriter=new FileWriter();
+    private int waiting_time=1000;
+    private int hops=0;
 
     private int fileFoundState=2;
     long startTime;
@@ -61,10 +64,10 @@ public class FileSearchImpl implements FileSearch {
         hops--;
         if (searchResults.size() > 0) {
             System.out.println("File Found!!!");
+            fileFoundState=1;
             addRecords(fileName, originatorIP, String.valueOf(originatorPort));
             forwardFileSearchOKResponse(searchResults, hops, originatorIP, originatorPort);
 
-            fileFoundState=1;
         } else {
             if (hops > 0) {
                 //check whether filename is already included in previous search results
@@ -79,7 +82,6 @@ public class FileSearchImpl implements FileSearch {
             } else {
                 forwardFileSearchOKResponse(null, -10, originatorIP, originatorPort);
                 System.out.println("File Couldn't found!!!");
-                fileFoundState=0;
             }
         }
         
@@ -93,10 +95,17 @@ public class FileSearchImpl implements FileSearch {
             System.out.println("Owner IP : " + ownerIP);
             System.out.println("Owner Port : " + ownerPort);
             System.out.println("Number of Hops : " + (3 - numberOfHops));
+            hops=(3 - numberOfHops);
 
             ArrayList<String[]> searchResultsToDisplay = new ArrayList<String[]>();
+            fileFoundState=1;            
 
-            System.out.println("Files Found-----------------");
+            Long elapsed;
+            elapsed=(System.nanoTime()-startTime);
+
+            System.out.println("Files Found-----------------"+elapsed);
+            //fileWriter.addLine("1,"+hops+","+Long.toString(elapsed));
+
             for (String searchResult : searchResults) {
                 System.out.println(searchResult);
                 searchResultsToDisplay.add(new String[]{searchResult, ownerIP, String.valueOf(ownerPort)});
@@ -108,6 +117,7 @@ public class FileSearchImpl implements FileSearch {
 
         if (numberOfHops == -10 && searchResults == null) {
             System.out.println("File not found");
+            fileFoundState=0;
         }
     }
 
@@ -156,7 +166,7 @@ public class FileSearchImpl implements FileSearch {
     }
 
     @Override
-    public void search(String outMessage){
+    public void search(String outMessage){  // search result catch  ####################################################################
         try {
             startTime=System.nanoTime();
                 ArrayList<String> searchResults = searchFiles(outMessage.split(" ")[1]); //search file in the own directory
@@ -165,6 +175,7 @@ public class FileSearchImpl implements FileSearch {
             } else {
                 //check whether filename is already included in previous search results
                 String[] ownersDetailsOfFiles = searchPreviousSearchResults(outMessage.split(" ")[1]);
+                ownersDetailsOfFiles=null;
                 if (ownersDetailsOfFiles != null) {
                     //forward request to owner
                     System.out.println("File found from previous searched results. Request is forwarded directly to the owner.");
@@ -175,29 +186,37 @@ public class FileSearchImpl implements FileSearch {
                 }
             }
 
-            while(fileFoundState==2){
-                long elapsed=(System.nanoTime()-startTime)/1000000;
-                
-                if(fileFoundState==1){
-                    System.out.println("****File Found Time Elapsed:"+Long.toString(elapsed));
-                    break;
-                }else if(fileFoundState==0){
-                    System.out.println("not found.. Time Elapsed:"+Long.toString(elapsed));
-                    break;
-                }
+            long elapsed=0;
 
-                if(elapsed>3000){
+            while(fileFoundState==2){
+                elapsed=(System.nanoTime()-startTime);
+
+                if(elapsed/1000000>waiting_time){
                     System.out.println("not found.. Time Elapsed:"+Long.toString(elapsed));
-                    
+                    fileWriter.addLine("-1,"+hops+","+Long.toString(elapsed));
                     break;
                 }else{
                     TimeUnit.MILLISECONDS.sleep(10);
                 }
             }
 
+            if(fileFoundState==1){
+                System.out.println("*******File Found Time Elapsed:"+Long.toString(elapsed));
+                //fileWriter.addLine("1,"+hops+","+Long.toString(elapsed));
+                System.out.println("__________________1,"+hops+","+Long.toString(elapsed));
+            }else if(fileFoundState==0){
+                System.out.println("not found.. Time Elapsed:"+Long.toString(elapsed));
+                fileWriter.addLine("0,"+hops+","+Long.toString(elapsed));
+            }
+
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void writeResults(){
+        fileWriter.closeFile();
     }
 
     @Override

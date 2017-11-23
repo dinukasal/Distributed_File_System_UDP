@@ -22,4 +22,6 @@ public interface FileSearch {
     void search(String outMessage);
 
     void searchWithOk(String outMessage);
+
+    void writeResults();
 }

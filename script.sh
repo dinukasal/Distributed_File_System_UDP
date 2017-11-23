@@ -1,3 +1,3 @@
 mvn compile
 cd target/classes
-java Node.NodeDriver localhost localhost
+java Node.NodeQuery localhost localhost

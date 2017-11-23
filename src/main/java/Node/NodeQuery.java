@@ -44,8 +44,9 @@ public class NodeQuery {
 
             while((line = bufferedReader.readLine()) != null) {
                 System.out.println("Search >> "+line);
-                node.search("ser "+line);            
+                node.search("ser "+line);          
             }
+            node.writeResults();
         }catch(Exception e){
             e.printStackTrace();
         }
