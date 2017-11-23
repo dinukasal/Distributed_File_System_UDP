@@ -4,7 +4,7 @@ import Node.Communicators.SearchCommunicator;
 import Node.Communicators.SearchCommunicatorUDPImpl;
 import Node.Node;
 import Node.Neighbour;
-import Node.FileWriter;
+import Node.FileWrite;
 
 import com.sun.org.apache.xpath.internal.SourceTree;
 import java.io.*;
@@ -30,9 +30,10 @@ public class FileSearchImpl implements FileSearch {
     private SearchCommunicator searchCommunicator = new SearchCommunicatorUDPImpl();
     private Node node;
     private ExecutorService executorService;
-    private FileWriter fileWriter=new FileWriter();
-    private int waiting_time=1000;
+    private FileWrite fileWriter=new FileWrite();
+    private int waiting_time=3000;
     private int hops=0;
+    private int MAX_HOPS=10;
 
     private int fileFoundState=2;
     long startTime;
@@ -168,10 +169,12 @@ public class FileSearchImpl implements FileSearch {
     @Override
     public void search(String outMessage){  // search result catch  ####################################################################
         try {
+            fileFoundState=2;
             startTime=System.nanoTime();
                 ArrayList<String> searchResults = searchFiles(outMessage.split(" ")[1]); //search file in the own directory
             if (searchResults.size() > 0) {
                 System.out.println("File Found in My Node");
+                fileFoundState=1;
             } else {
                 //check whether filename is already included in previous search results
                 String[] ownersDetailsOfFiles = searchPreviousSearchResults(outMessage.split(" ")[1]);
@@ -179,10 +182,10 @@ public class FileSearchImpl implements FileSearch {
                 if (ownersDetailsOfFiles != null) {
                     //forward request to owner
                     System.out.println("File found from previous searched results. Request is forwarded directly to the owner.");
-                    forwardFileSearchRequestToOwner(outMessage.split(" ")[1], 3, ownersDetailsOfFiles[0],
+                    forwardFileSearchRequestToOwner(outMessage.split(" ")[1], MAX_HOPS, ownersDetailsOfFiles[0],
                             Integer.parseInt(ownersDetailsOfFiles[1]), node.getIpAddress(), node.getPort());
                 } else {
-                    forwardFileSearchRequest(outMessage.split(" ")[1], 3, node.getIpAddress(), node.getPort()); //forward request to a neighbour
+                    forwardFileSearchRequest(outMessage.split(" ")[1], MAX_HOPS, node.getIpAddress(), node.getPort()); //forward request to a neighbour
                 }
             }
 
@@ -193,7 +196,7 @@ public class FileSearchImpl implements FileSearch {
 
                 if(elapsed/1000000>waiting_time){
                     System.out.println("not found.. Time Elapsed:"+Long.toString(elapsed));
-                    fileWriter.addLine("-1,"+hops+","+Long.toString(elapsed));
+                    //fileWriter.addLine("-1,"+hops+","+Long.toString(elapsed));
                     break;
                 }else{
                     TimeUnit.MILLISECONDS.sleep(10);
@@ -202,7 +205,7 @@ public class FileSearchImpl implements FileSearch {
 
             if(fileFoundState==1){
                 System.out.println("*******File Found Time Elapsed:"+Long.toString(elapsed));
-                //fileWriter.addLine("1,"+hops+","+Long.toString(elapsed));
+                fileWriter.addLine("1,"+hops+","+Long.toString(elapsed));
                 System.out.println("__________________1,"+hops+","+Long.toString(elapsed));
             }else if(fileFoundState==0){
                 System.out.println("not found.. Time Elapsed:"+Long.toString(elapsed));
@@ -246,13 +249,13 @@ public class FileSearchImpl implements FileSearch {
     private void initializeFiles() {
 
         HashMap<String, File> allFiles = new HashMap<String, File>();
-        allFiles.put("Lord of the_Rings", new File("G:\\Films\\LR\\Lord_of_the_Rings.mov"));
-        allFiles.put("Harry Porter 1", new File("G:\\Films\\HP\\Harry_Porter_1.mov"));
-        allFiles.put("Fast_and_Furious", new File("G:\\Films\\FF\\Fast_and_Furious.mov"));
-        allFiles.put("La_La_Land", new File("G:\\Films\\LR\\La_La_Land.mov"));
-        allFiles.put("Transformers", new File("G:\\Films\\Transformers\\Transformers.mov"));
-        allFiles.put("Spider_Man_1", new File("G:\\Films\\SP\\Spider_Man_1.mov"));
-        allFiles.put("abc", new File("G:\\Films\\abc\\abc.mov"));
+        // allFiles.put("Lord of the_Rings", new File("G:\\Films\\LR\\Lord_of_the_Rings.mov"));
+        // allFiles.put("Harry Porter 1", new File("G:\\Films\\HP\\Harry_Porter_1.mov"));
+        // allFiles.put("Fast_and_Furious", new File("G:\\Films\\FF\\Fast_and_Furious.mov"));
+        // allFiles.put("La_La_Land", new File("G:\\Films\\LR\\La_La_Land.mov"));
+        // allFiles.put("Transformers", new File("G:\\Films\\Transformers\\Transformers.mov"));
+        // allFiles.put("Spider_Man_1", new File("G:\\Films\\SP\\Spider_Man_1.mov"));
+        // allFiles.put("abc", new File("G:\\Films\\abc\\abc.mov"));
 
         // The name of the file to open.
         String fileName = "FileNames.txt";
