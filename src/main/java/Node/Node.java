@@ -126,13 +126,16 @@ public class Node {
         return bootstrapCommunicator.register(ipAddress,port,"n1");
     }
 
-    private void connect(List<Neighbour> nodeList) throws IOException {
+    private void connect(List<Neighbour> nodeList) throws IOException { // issue 1
         if ( nodeList != null){
             for (Neighbour node: nodeList){
-                if ( node.getIp().equals(ipAddress) && node.getPort() != port){
+                //System.out.println("##########  "+node.getIp()+","+node.getPort());
+                //if ( !node.getIp().equals(ipAddress) && node.getPort() != port){
+                    //System.out.println("##########  "+node.getIp()+","+node.getPort());
+
                     // should be node.getIp().equals(ipAddress) in ds
                     nodeCommunicator.join(ipAddress,port,node.getIp(),node.getPort());
-                }
+                //}
             }
         }
     }

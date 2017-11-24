@@ -13,6 +13,7 @@ public class NodeCommunicatorUDPImpl implements NodeCommunicator {
 
     @Override
     public void join(String fromIp, int fromPort, String toIp,int toPort) throws IOException {
+        System.out.println("////////////\\\\\\\\\\\\"+fromIp+","+fromPort);
         String msg = String.format(JOIN_FORMAT, fromIp, fromPort);
         String request = Request.create(msg);
         Request.sendSyncMessage(request, toIp, Integer.toString(toPort));

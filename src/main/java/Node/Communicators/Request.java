@@ -64,7 +64,6 @@ public class Request {
     }
 
     public static List<Neighbour> decodeRegisterResponse(String response) throws RemoteException, NotBoundException, MalformedURLException {
-
         StringTokenizer st = new StringTokenizer(response, " ");
         String length = "", command = "";
         length = st.nextToken();
@@ -76,7 +75,6 @@ public class Request {
 
             int no_nodes = Integer.parseInt(st.nextToken());
 
-
             switch (no_nodes) {
                 case 0:
                     LOGGER.log(Level.INFO, "no nodes in the system");
@@ -85,7 +83,9 @@ public class Request {
                 case 2:
                     nodeList = new ArrayList<>();
                     while (no_nodes > 0) {
-                        nodeList.add(new Neighbour(st.nextToken(), Integer.parseInt(st.nextToken()), (float)1.0));
+                        String param1=st.nextToken();
+                        String param2=st.nextToken();
+                        nodeList.add(new Neighbour(param1, Integer.parseInt(param2), (float)1.0));
                         no_nodes--;
                     }
                     break;
