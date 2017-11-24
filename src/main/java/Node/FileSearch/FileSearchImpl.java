@@ -31,7 +31,7 @@ public class FileSearchImpl implements FileSearch {
     private Node node;
     private ExecutorService executorService;
     private FileWrite fileWriter=new FileWrite();
-    private int waiting_time=3000;
+    private int waiting_time=1000;
     private int hops=0;
     private int MAX_HOPS=10;
 
@@ -81,8 +81,11 @@ public class FileSearchImpl implements FileSearch {
                     forwardFileSearchRequest(fileName, hops, originatorIP, originatorPort); //forward request to a neighbour
                 }
             } else {
+                Long elapsed;
+                elapsed=(System.nanoTime()-startTime);
+
                 forwardFileSearchOKResponse(null, -10, originatorIP, originatorPort);
-                System.out.println("File Couldn't found!!!");
+                System.out.println("File Couldn't found!!! "+elapsed);
             }
         }
         
@@ -210,6 +213,7 @@ public class FileSearchImpl implements FileSearch {
             }else if(fileFoundState==0){
                 System.out.println("not found.. Time Elapsed:"+Long.toString(elapsed));
                 fileWriter.addLine("0,"+hops+","+Long.toString(elapsed));
+                System.out.println("______0_____0_____,"+hops+","+Long.toString(elapsed));
             }
 
         }catch (Exception e){
@@ -361,7 +365,10 @@ public class FileSearchImpl implements FileSearch {
                 }
                 totalIterations++;
             }
-            System.out.println("File Couldn't found & File Search Request forwarded");
+            Long elapsed=(System.nanoTime()-startTime);
+            System.out.println("File Couldn't found & File Search Request forwarded "+elapsed);
+            fileWriter.addLine("0,"+hops+","+Long.toString(elapsed));
+            
 
             searchCommunicator.search(node.getIpAddress(),node.getPort(),randomSuccessor.getIp(),
                     randomSuccessor.getPort(),originatorIP,originatorPort,
