@@ -188,6 +188,7 @@ public class FileSearchImpl implements FileSearch {
                 ArrayList<String> searchResults = searchFiles(outMessage.split(" ")[1]); //search file in the own directory
             if (searchResults.size() > 0) {
                 System.out.println("File Found in My Node");
+                hops=0;
                 fileFoundState=1;
             } else {
                 //check whether filename is already included in previous search results
