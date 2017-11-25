@@ -100,8 +100,8 @@ public class FileSearchImpl implements FileSearch {
             System.out.println("File Found in....");
             System.out.println("Owner IP : " + ownerIP);
             System.out.println("Owner Port : " + ownerPort);
-            System.out.println("Number of Hops : " + (numberOfHops-MAX_HOPS));
-            hops=numberOfHops-MAX_HOPS;
+            System.out.println("Number of Hops : " + (MAX_HOPS-numberOfHops));
+            hops=MAX_HOPS-numberOfHops;
 
             ArrayList<String[]> searchResultsToDisplay = new ArrayList<String[]>();
             fileFoundState=1;            
