@@ -71,6 +71,10 @@ public class Node {
         return myNeighbours;
     }
 
+    public int myNeighbourCount(){
+        return myNeighbours.size();
+    }
+
     public void start() throws IOException, NotBoundException {
 
         LOGGER.log(Level.INFO, "Node server is starting !!!");
@@ -146,5 +150,9 @@ public class Node {
 
     public void writeResults(){
         fileSearch.writeResults();
+    }
+
+    public int getMsgCount(){
+        return Request.getMsgCount();
     }
 }

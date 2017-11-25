@@ -1,3 +1,3 @@
 mvn compile
 cd target/classes
-java Node.NodeQuery localhost localhost
+java Node.PerformanceEvaluator localhost localhost

@@ -8,4 +8,4 @@ do
 	sleep 0.5
 done
 
-java Node.NodeQuery localhost localhost
+java Node.PerformanceEvaluator localhost localhost

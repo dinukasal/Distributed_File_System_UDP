@@ -22,6 +22,7 @@ public class Request {
 
     private static byte[] buf = new byte[1000];
     private final static Logger LOGGER = Logger.getLogger(Request.class.getName());
+    private static int msgCount=0;
 
     public static String sendAsyncMessage(String outString, String outAddress, String outPort) throws IOException {
 
@@ -33,6 +34,7 @@ public class Request {
         LOGGER.log(Level.INFO, "SENDING... => " + outString + " to " + outPort);
 
         datagramSocket.send(out);
+        msgCount++;
 
         DatagramPacket incoming = new DatagramPacket(buf, buf.length);
         datagramSocket.receive(incoming);
@@ -50,6 +52,7 @@ public class Request {
 
         LOGGER.log(Level.FINEST, "SENDING... => " + outString + " to " + outPort);
         datagramSocket.send(out);
+        msgCount++;
 
     }
 
@@ -60,6 +63,7 @@ public class Request {
 
         LOGGER.log(Level.FINEST, "SENDING... => " + outString + " to " + outPort);
         datagramSocket.send(out);
+        msgCount++;
 
     }
 
@@ -134,5 +138,9 @@ public class Request {
 
     public static String create(String msg){
         return String.format(Constants.MSG_FORMAT, msg.length() + 5, msg);
+    }
+
+    public static int getMsgCount(){
+        return msgCount;
     }
 }

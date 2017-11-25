@@ -5,6 +5,7 @@ import Node.Communicators.SearchCommunicatorUDPImpl;
 import Node.Node;
 import Node.Neighbour;
 import Node.FileWrite;
+import Node.PerformanceEvaluator;
 
 import com.sun.org.apache.xpath.internal.SourceTree;
 import java.io.*;
@@ -34,6 +35,7 @@ public class FileSearchImpl implements FileSearch {
     private int waiting_time=1000;
     private int hops=0;
     private int MAX_HOPS=10;
+    private PerformanceEvaluator perfEval =new PerformanceEvaluator();
 
     private int fileFoundState=2;
     long startTime;
@@ -152,7 +154,7 @@ public class FileSearchImpl implements FileSearch {
         return filesToStore;
     }
 
-    public void readStdin() { //get input from command line
+    public void readStdin() { //get input from command line -   STDIn handler
         BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
         try {
             while (true) {
@@ -160,7 +162,15 @@ public class FileSearchImpl implements FileSearch {
 
                 if (outMessage.contains("ser")) {
                     search(outMessage);
-                } else {
+                } else if(outMessage.contains("msg")){  //give msg count
+                    System.out.println(node.getMsgCount());
+                }else if(outMessage.contains("nbr")){   //count neighbours
+                    System.out.println(node.myNeighbourCount());
+                }
+                else if(outMessage.contains("perf")){   //count neighbours
+                    perfEval.perfEval(node);
+                }
+                else {
                     System.out.println("null in this node");
                 }
             }
