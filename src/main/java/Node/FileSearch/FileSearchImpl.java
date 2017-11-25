@@ -167,8 +167,9 @@ public class FileSearchImpl implements FileSearch {
                 }else if(outMessage.contains("nbr")){   //count neighbours
                     System.out.println(node.myNeighbourCount());
                 }
-                else if(outMessage.contains("perf")){   //count neighbours
+                else if(outMessage.contains("perf")){   //performance evaluation
                     perfEval.perfEval(node);
+                    fileWriter.printLines();
                 }
                 else {
                     System.out.println("null in this node");

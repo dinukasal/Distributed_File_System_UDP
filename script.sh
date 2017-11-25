@@ -1,3 +1,3 @@
 mvn compile
 cd target/classes
-java Node.PerformanceEvaluator localhost localhost
+java Node.NodeDriver localhost localhost

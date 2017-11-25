@@ -27,4 +27,10 @@ public class FileWrite{
         writer.close();        
     }
 
+    public void printLines(){
+        for(String object: list){
+            System.out.println(object);
+        }
+    }
+
 }
